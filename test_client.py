@@ -11,7 +11,7 @@ async def test_http_server():
     print("=" * 30)
     
     # Connect to your running HTTP server
-    client = Client("https://jungle-aggregate-specifics-tulsa.trycloudflare.com/mcp/", auth="123123")
+    client = Client("https://puch-ai-e110.onrender.com/mcp/", auth="123123")
     # client = Client("http://localhost:8080/mcp/")
     
     try:
