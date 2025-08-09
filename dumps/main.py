@@ -4,6 +4,12 @@ from pydantic import BaseModel
 import uvicorn
 import json
 import os
+import logging
+
+# --- Logger Setup ---
+# Configure basic logging to show info-level messages and above
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # --- Pydantic Models for Request and Response ---
 # These models define the structure of the data we'll be sending and receiving.
@@ -33,6 +39,16 @@ app = FastAPI(title="Basic MCP Server")
 @app.get("/")
 def read_root():
     return {"message": "MCP Server is running!"}
+
+# --- New GET route for /mcp ---
+@app.get("/mcp")
+def mcp_get_info():
+    """
+    Handles GET requests to the /mcp endpoint.
+    This is often used for a simple health check or to provide basic info.
+    """
+    logger.info("GET request received for /mcp endpoint. Responding with service info.")
+    return {"message": "MCP Service is available."}
 
 # --- Core MCP Logic ---
 @app.post("/mcp", response_model=MCPResponse)
@@ -101,17 +117,17 @@ async def validate_tool(bearer_token: str):
     Validates the bearer token and returns the user's phone number.
     This is a critical, required tool for the MCP server.
     """
-    # For this basic demo, we'll hardcode a token and a phone number.
-    # In a real-world application, you would use this token to look up the
-    # user's information from your database.
     VALID_TOKEN = "abc123token"
     VALID_PHONE_NUMBER = "919876543210" # Example for an Indian number
 
+    # Log the incoming token for debugging purposes
+    logger.info(f"Received validation request with token: {bearer_token}")
+
     if bearer_token == VALID_TOKEN:
-        # If the token is valid, return the user's phone number
+        logger.info("Token is valid. Returning user ID.")
         return {"user_id": VALID_PHONE_NUMBER}
     else:
-        # If the token is invalid, raise an exception to indicate failure.
+        logger.warning("Invalid bearer token received. Returning 401.")
         raise HTTPException(status_code=401, detail="Invalid bearer token")
 
 async def get_time_tool():
