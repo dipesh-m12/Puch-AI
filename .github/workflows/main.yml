@@ -1,0 +1,10 @@
+name: Keep Server Alive
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Every 5 minutes
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl https://puch-ai-e110.onrender.com/health
