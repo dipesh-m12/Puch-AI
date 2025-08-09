@@ -7,37 +7,40 @@ For Cloudflare tunnel connectivity
 from fastmcp import FastMCP
 import sys
 import os
+from fastmcp.server.auth.providers.bearer import BearerAuthProvider, RSAKeyPair
+from mcp.server.auth.provider import AccessToken
 
 # Fix encoding for Windows
 if sys.platform == "win32":
     os.environ["PYTHONIOENCODING"] = "utf-8"
 
-# Create minimal MCP server
-mcp = FastMCP("Puch MCP")
+TOKEN="123123"
+MY_NUMBER="919321440314"
 
-@mcp.tool()
-def validate(token: str) -> str:
-    """REQUIRED: Validate token for Puch AI - returns phone number"""
-    print(f"Validate called with token: {token}")
-    
-    # Token-to-phone mapping - in real implementation, this would be from a database
-    token_mappings = {
-        "123123": "919876543210",  # Your token mapped to your phone number
-        "test": "919876543210",
-        "dipesh": "919876543210"
-    }
-    
-    if token in token_mappings:
-        phone_number = token_mappings[token]
-        print(f"Token '{token}' validated, returning phone: {phone_number}")
-        return phone_number
-    elif len(token) > 2:  # Fallback for any token
-        phone_number = "919876543210"
-        print(f"Using fallback phone number: {phone_number}")
-        return phone_number
-    
-    print("Token validation failed")
-    raise ValueError("Invalid token")
+# --- Auth Provider ---
+class SimpleBearerAuthProvider(BearerAuthProvider):
+    def __init__(self, token: str):
+        k = RSAKeyPair.generate()
+        super().__init__(public_key=k.public_key, jwks_uri=None, issuer=None, audience=None)
+        self.token = token
+
+    async def load_access_token(self, token: str) -> AccessToken | None:
+        if token == self.token:
+            return AccessToken(
+                token=token,
+                client_id="puch-client",
+                scopes=["*"],
+                expires_at=None,
+            )
+        return None
+
+# Create minimal MCP server
+mcp = FastMCP("Puch MCP",  auth=SimpleBearerAuthProvider(TOKEN),)
+
+# --- Tool: validate (required by Puch) ---
+@mcp.tool
+async def validate() -> str:
+    return MY_NUMBER
 
 @mcp.tool()
 def send_message(phone: str, message: str) -> dict:

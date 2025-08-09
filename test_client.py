@@ -11,7 +11,7 @@ async def test_http_server():
     print("=" * 30)
     
     # Connect to your running HTTP server
-    client = Client("https://investor-songs-flow-consultants.trycloudflare.com/mcp/")
+    client = Client("https://investor-songs-flow-consultants.trycloudflare.com/mcp/",auth="123123")
     # client = Client("http://localhost:8080/mcp/")
     
     try:
@@ -33,7 +33,7 @@ async def test_http_server():
             
             # 1. Test validate
             print("\n1. Testing validate...")
-            result = await client.call_tool("validate", {"token": "123123"})
+            result = await client.call_tool("validate")
             print(f"   Result: {result.content[0].text if result.content else 'No content'}")
             
             # 2. Test send_message
