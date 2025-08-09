@@ -11,7 +11,7 @@ async def test_http_server():
     print("=" * 30)
     
     # Connect to your running HTTP server
-    client = Client("https://investor-songs-flow-consultants.trycloudflare.com/mcp/",auth="123123")
+    client = Client("https://jungle-aggregate-specifics-tulsa.trycloudflare.com/mcp/", auth="123123")
     # client = Client("http://localhost:8080/mcp/")
     
     try:
@@ -34,7 +34,7 @@ async def test_http_server():
             # 1. Test validate
             print("\n1. Testing validate...")
             result = await client.call_tool("validate")
-            print(f"   Result: {result.content[0].text if result.content else 'No content'}")
+            print(f"   Result: {result[0].text if result and len(result) > 0 else 'No content'}")
             
             # 2. Test send_message
             print("\n2. Testing send_message...")
@@ -42,22 +42,22 @@ async def test_http_server():
                 "phone": "919876543210", 
                 "message": "Hello from test!"
             })
-            print(f"   Result: {result.content[0].text if result.content else 'No content'}")
+            print(f"   Result: {result[0].text if result and len(result) > 0 else 'No content'}")
             
             # 3. Test get_contacts (no search)
             print("\n3. Testing get_contacts...")
             result = await client.call_tool("get_contacts")
-            print(f"   Result: {result.content[0].text if result.content else 'No content'}")
+            print(f"   Result: {result[0].text if result and len(result) > 0 else 'No content'}")
             
             # 4. Test get_contacts (with search)
             print("\n4. Testing get_contacts with search...")
             result = await client.call_tool("get_contacts", {"search": "John"})
-            print(f"   Result: {result.content[0].text if result.content else 'No content'}")
+            print(f"   Result: {result[0].text if result and len(result) > 0 else 'No content'}")
             
             # 5. Test get_analytics
             print("\n5. Testing get_analytics...")
             result = await client.call_tool("get_analytics")
-            print(f"   Result: {result.content[0].text if result.content else 'No content'}")
+            print(f"   Result: {result[0].text if result and len(result) > 0 else 'No content'}")
             
             print("\n✅ All tests completed!")
             

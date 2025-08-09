@@ -9,6 +9,8 @@ import sys
 import os
 from fastmcp.server.auth.providers.bearer import BearerAuthProvider, RSAKeyPair
 from mcp.server.auth.provider import AccessToken
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse
 
 # Fix encoding for Windows
 if sys.platform == "win32":
@@ -34,13 +36,19 @@ class SimpleBearerAuthProvider(BearerAuthProvider):
             )
         return None
 
+
 # Create minimal MCP server
 mcp = FastMCP("Puch MCP",  auth=SimpleBearerAuthProvider(TOKEN),)
+
 
 # --- Tool: validate (required by Puch) ---
 @mcp.tool
 async def validate() -> str:
     return MY_NUMBER
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> PlainTextResponse:
+    return PlainTextResponse("OK")
 
 @mcp.tool()
 def send_message(phone: str, message: str) -> dict:
