@@ -12,6 +12,7 @@ async def test_http_server():
     
     # Connect to your running HTTP server
     client = Client("https://investor-songs-flow-consultants.trycloudflare.com/mcp/")
+    # client = Client("http://localhost:8080/mcp/")
     
     try:
         async with client:

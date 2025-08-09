@@ -7,8 +7,6 @@ For Cloudflare tunnel connectivity
 from fastmcp import FastMCP
 import sys
 import os
-from starlette.requests import Request
-from starlette.responses import PlainTextResponse
 
 # Fix encoding for Windows
 if sys.platform == "win32":
@@ -17,19 +15,25 @@ if sys.platform == "win32":
 # Create minimal MCP server
 mcp = FastMCP("Puch MCP")
 
-@mcp.custom_route("/health", methods=["GET"])
-async def health_check(request: Request) -> PlainTextResponse:
-    return PlainTextResponse("OK")
-
 @mcp.tool()
 def validate(token: str) -> str:
     """REQUIRED: Validate token for Puch AI - returns phone number"""
     print(f"Validate called with token: {token}")
     
-    if token and len(token) > 2:
-        # Return the phone number in the exact format expected
-        phone_number = "919321440314"
-        print(f"Returning phone number: {phone_number}")
+    # Token-to-phone mapping - in real implementation, this would be from a database
+    token_mappings = {
+        "123123": "919876543210",  # Your token mapped to your phone number
+        "test": "919876543210",
+        "dipesh": "919876543210"
+    }
+    
+    if token in token_mappings:
+        phone_number = token_mappings[token]
+        print(f"Token '{token}' validated, returning phone: {phone_number}")
+        return phone_number
+    elif len(token) > 2:  # Fallback for any token
+        phone_number = "919876543210"
+        print(f"Using fallback phone number: {phone_number}")
         return phone_number
     
     print("Token validation failed")
